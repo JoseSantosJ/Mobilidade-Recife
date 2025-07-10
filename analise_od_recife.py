@@ -193,8 +193,11 @@ def analisar_mobilidade(df):
         
         # Gráfico de mobilidade reduzida
         plt.figure()
-        mobilidade_count.plot(kind='bar')
+        bars = plt.bar(mobilidade_count.index, mobilidade_count.values)
         plt.title('Pessoas com Mobilidade Reduzida')
+        plt.xlabel('Situação')
+        plt.ylabel('Quantidade')
+        plt.xticks(rotation=0)
         plt.tight_layout()
         plt.savefig('mobilidade_reduzida.png')
         plt.close()
@@ -229,104 +232,91 @@ def analisar_transportes(df):
     """
     print("\n===== ANÁLISE DE TRANSPORTES =====")
     
-    # Simplificando valores para meio_transporte_trab
-    # Para fins de análise, consideramos apenas transportes únicos (não combinações)
+    # Dicionário para mapeamento de transporte
+    transporte_map = {
+        1: 'A pé', 2: 'Bicicleta', 3: 'Ônibus', 4: 'Metrô',
+        5: 'Carro (dirigindo)', 6: 'Carro (carona familiar)',
+        7: 'Carro (carona amigo)', 8: 'Carro (motorista)',
+        9: 'Motocicleta', 10: 'Transporte escolar',
+        11: 'Táxi', 12: 'Fretado'
+    }
+    
+    # Contagem para trabalho
     transportes_trab = {}
+    if 'meio_transporte_trab' in df.columns:
+        work_transport = df[df['trabalha'] == 1]['meio_transporte_trab'].dropna()
+        
+        for valor in work_transport:
+            if isinstance(valor, (int, float)) and valor in transporte_map:
+                meio = transporte_map[valor]
+                transportes_trab[meio] = transportes_trab.get(meio, 0) + 1
+            elif isinstance(valor, str):
+                try:
+                    primeiro_valor = int(valor.split(',')[0].strip())
+                    if primeiro_valor in transporte_map:
+                        meio = transporte_map[primeiro_valor]
+                        transportes_trab[meio] = transportes_trab.get(meio, 0) + 1
+                except:
+                    continue
     
-    for valor in df['meio_transporte_trab'].dropna().unique():
-        if isinstance(valor, (int, float)) and valor in range(1, 13):
-            if valor == 1:
-                transportes_trab['A pé'] = len(df[df['meio_transporte_trab'] == 1])
-            elif valor == 2:
-                transportes_trab['Bicicleta'] = len(df[df['meio_transporte_trab'] == 2])
-            elif valor == 3:
-                transportes_trab['Ônibus'] = len(df[df['meio_transporte_trab'] == 3])
-            elif valor == 4:
-                transportes_trab['Metrô'] = len(df[df['meio_transporte_trab'] == 4])
-            elif valor == 5:
-                transportes_trab['Carro (dirigindo)'] = len(df[df['meio_transporte_trab'] == 5])
-            elif valor == 6:
-                transportes_trab['Carro (carona familiar)'] = len(df[df['meio_transporte_trab'] == 6])
-            elif valor == 7:
-                transportes_trab['Carro (carona amigo)'] = len(df[df['meio_transporte_trab'] == 7])
-            elif valor == 8:
-                transportes_trab['Carro (motorista)'] = len(df[df['meio_transporte_trab'] == 8])
-            elif valor == 9:
-                transportes_trab['Motocicleta'] = len(df[df['meio_transporte_trab'] == 9])
-            elif valor == 10:
-                transportes_trab['Transporte escolar'] = len(df[df['meio_transporte_trab'] == 10])
-            elif valor == 11:
-                transportes_trab['Táxi'] = len(df[df['meio_transporte_trab'] == 11])
-            elif valor == 12:
-                transportes_trab['Fretado'] = len(df[df['meio_transporte_trab'] == 12])
-    
-    # Fazendo o mesmo para transporte para estudo
+    # Contagem para estudo
     transportes_estudo = {}
-    
-    for valor in df['transporte_aula'].dropna().unique():
-        if isinstance(valor, (int, float)) and valor in range(1, 13):
-            if valor == 1:
-                transportes_estudo['A pé'] = len(df[df['transporte_aula'] == 1])
-            elif valor == 2:
-                transportes_estudo['Bicicleta'] = len(df[df['transporte_aula'] == 2])
-            elif valor == 3:
-                transportes_estudo['Ônibus'] = len(df[df['transporte_aula'] == 3])
-            elif valor == 4:
-                transportes_estudo['Metrô'] = len(df[df['transporte_aula'] == 4])
-            elif valor == 5:
-                transportes_estudo['Carro (dirigindo)'] = len(df[df['transporte_aula'] == 5])
-            elif valor == 6:
-                transportes_estudo['Carro (carona familiar)'] = len(df[df['transporte_aula'] == 6])
-            elif valor == 7:
-                transportes_estudo['Carro (carona amigo)'] = len(df[df['transporte_aula'] == 7])
-            elif valor == 8:
-                transportes_estudo['Carro (motorista)'] = len(df[df['transporte_aula'] == 8])
-            elif valor == 9:
-                transportes_estudo['Motocicleta'] = len(df[df['transporte_aula'] == 9])
-            elif valor == 10:
-                transportes_estudo['Transporte escolar'] = len(df[df['transporte_aula'] == 10])
-            elif valor == 11:
-                transportes_estudo['Táxi'] = len(df[df['transporte_aula'] == 11])
-            elif valor == 12:
-                transportes_estudo['Fretado'] = len(df[df['transporte_aula'] == 12])
+    if 'transporte_aula' in df.columns:
+        study_transport = df[df['pesquisado_estuda'] == 1]['transporte_aula'].dropna()
+        
+        for valor in study_transport:
+            if isinstance(valor, (int, float)) and valor in transporte_map:
+                meio = transporte_map[valor]
+                transportes_estudo[meio] = transportes_estudo.get(meio, 0) + 1
+            elif isinstance(valor, str):
+                try:
+                    primeiro_valor = int(valor.split(',')[0].strip())
+                    if primeiro_valor in transporte_map:
+                        meio = transporte_map[primeiro_valor]
+                        transportes_estudo[meio] = transportes_estudo.get(meio, 0) + 1
+                except:
+                    continue
     
     # Exibindo resultados
-    print("\nMeios de Transporte para o Trabalho:")
-    for modo, quantidade in sorted(transportes_trab.items(), key=lambda x: x[1], reverse=True):
-        print(f"{modo}: {quantidade} ({quantidade/trabalham*100:.2f}%)")
+    if transportes_trab:
+        print("\nMeios de Transporte para o Trabalho:")
+        for modo, quantidade in sorted(transportes_trab.items(), key=lambda x: x[1], reverse=True):
+            print(f"{modo}: {quantidade} ({quantidade/trabalham*100:.2f}%)")
     
-    print("\nMeios de Transporte para Estudo:")
-    for modo, quantidade in sorted(transportes_estudo.items(), key=lambda x: x[1], reverse=True):
-        print(f"{modo}: {quantidade} ({quantidade/estudam*100:.2f}%)")
-    
-    # Criando dataframes para visualização
-    transportes_trab_df = pd.DataFrame({
-        'Meio': list(transportes_trab.keys()),
-        'Quantidade': list(transportes_trab.values())
-    }).sort_values('Quantidade', ascending=False)
-    
-    transportes_estudo_df = pd.DataFrame({
-        'Meio': list(transportes_estudo.keys()),
-        'Quantidade': list(transportes_estudo.values())
-    }).sort_values('Quantidade', ascending=False)
+    if transportes_estudo:
+        print("\nMeios de Transporte para Estudo:")
+        for modo, quantidade in sorted(transportes_estudo.items(), key=lambda x: x[1], reverse=True):
+            print(f"{modo}: {quantidade} ({quantidade/estudam*100:.2f}%)")
     
     # Gráfico para meios de transporte para trabalho
-    plt.figure(figsize=(14, 8))
-    sns.barplot(data=transportes_trab_df, x='Meio', y='Quantidade')
-    plt.title('Meios de Transporte para o Trabalho')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.savefig('transportes_trabalho.png')
-    plt.close()
+    if transportes_trab:
+        transportes_trab_df = pd.DataFrame({
+            'Meio': list(transportes_trab.keys()),
+            'Quantidade': list(transportes_trab.values())
+        }).sort_values('Quantidade', ascending=False)
+        
+        plt.figure(figsize=(14, 8))
+        sns.barplot(data=transportes_trab_df, x='Meio', y='Quantidade')
+        plt.title('Meios de Transporte para o Trabalho')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.savefig('transportes_trabalho.png')
+        plt.close()
     
     # Gráfico para meios de transporte para estudo
-    plt.figure(figsize=(14, 8))
-    sns.barplot(data=transportes_estudo_df, x='Meio', y='Quantidade')
-    plt.title('Meios de Transporte para Estudo')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.savefig('transportes_estudo.png')
-    plt.close()
+    if transportes_estudo:
+        transportes_estudo_df = pd.DataFrame({
+            'Meio': list(transportes_estudo.keys()),
+            'Quantidade': list(transportes_estudo.values())
+        }).sort_values('Quantidade', ascending=False)
+        
+        plt.figure(figsize=(14, 8))
+        sns.barplot(data=transportes_estudo_df, x='Meio', y='Quantidade')
+        plt.title('Meios de Transporte para Estudo')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.savefig('transportes_estudo.png')
+        plt.close()
 
 # Função para analisar uso de aplicativos de táxi e terminais de integração
 def analisar_tecnologia(df):
