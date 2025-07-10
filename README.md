@@ -119,7 +119,7 @@ Concentração significativa na faixa de 25-39 anos (população economicamente 
 Predominância nas faixas de 1-2 salários mínimos, com concentração de baixa/média renda. Destaque para o grupo "sem rendimento", indicando desafios socioeconômicos.
 
 ### 4. Mobilidade Reduzida
-![Mobilidade Reduzida](mobilidade_reduzida.png)
+![Mobilidade Reduzida](distribuicao_renda.png)
 
 Baixa incidência de pessoas com mobilidade reduzida na amostra, sugerindo que a pesquisa capturou principalmente população com plena capacidade de locomoção.
 
